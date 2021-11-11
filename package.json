@@ -3,10 +3,8 @@
   "version": "0.0.0-development",
   "main": "index.js",
   "scripts": {
-    "semantic-release": "semantic-release"
-  },
-  "scripts": {
-   "publish": "npm publish --access public" // this was being triggered by running `npm publish`
+    "semantic-release": "semantic-release",
+    "publish": "npm publish --access public" 
   },
   "repository": {
     "type": "git",
