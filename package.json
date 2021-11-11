@@ -5,6 +5,9 @@
   "scripts": {
     "semantic-release": "semantic-release"
   },
+  "scripts": {
+   "publish": "npm publish --access public" // this was being triggered by running `npm publish`
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/kovurumanasa/manasa-package.git"
