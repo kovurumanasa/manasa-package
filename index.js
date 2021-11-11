@@ -1,4 +1,4 @@
-console.log("Hello from manasa's package")
+console.log("Hello from package")
 
 const sayHello = (name) => console.log("Hello, ${name}")
 
