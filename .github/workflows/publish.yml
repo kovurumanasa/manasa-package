@@ -117,15 +117,15 @@ jobs:
           PRE_TAG: ${{ needs.extract-pre-tag.outputs.tag }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - id: install-and-build
-        run: "cd design-tokens && yarn install && yarn build"
+        run: "npm ci"
       - id: version-bump
-        run: "cd design-tokens && yarn version --no-git-tag-version --no-commit-hooks --new-version $TAG_NAME"
+        run: "npm version --no-git-tag-version --no-commit-hooks --new-version $TAG_NAME"
         env:
           TAG_NAME: ${{ needs.extract-tag-name.outputs.tag }}
           PRE_TAG: ${{ needs.extract-pre-tag.outputs.tag }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - id: publish-to-registry
-        run: "cd design-tokens && yarn install && yarn build && yarn publish --access public --tag $PRE_TAG"
+        run: "npm ci && npm build && npm publish --access public --tag $PRE_TAG"
         env:
           TAG_NAME: ${{ needs.extract-tag-name.outputs.tag }}
           PRE_TAG: ${{ needs.extract-pre-tag.outputs.tag }}
