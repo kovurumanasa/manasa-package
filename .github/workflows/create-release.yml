@@ -22,12 +22,13 @@
 #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #       run: npx -p node@lts -c "npx semantic-release"
 
+
+name: Create Release
+
 on:
   push:
     tags:
-      - '*'
-
-name: Create Release
+      - 'v*'
 
 jobs:
   publish:
