@@ -1,4 +1,4 @@
-console.log("Hello from my updated package, released a new fix")
+console.log("Hello from my updated package, released new fix")
 
 const sayHello = (name) => console.log("Hello, ${name}")
 
