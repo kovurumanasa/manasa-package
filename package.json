@@ -1,16 +1,12 @@
 {
-  "name": "manasakovuru-package",
-  "version": "1.2.0",
+  "name": "manasakovuru-npm-package",
+  "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "semantic-release": "semantic-release",
-    "publish": "npm publish --access public" 
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/kovurumanasa/manasa-package.git"
-  },
-  "devDependencies": {
-    "semantic-release": "^18.0.0"
   }
 }
