@@ -22,48 +22,124 @@
 #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #       run: npx -p node@lts -c "npx semantic-release"
 
-name: Node.js CI
+name: Publish a release
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - v* #version is cut
+
+env:
+  NODE_VERSION: 12
 
 jobs:
-  package:
+  build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: manasa-package
+    environment:
+      name: build
+      url: ${{ steps.create_release.outputs.html_url }}
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          node-version: 12.x
-
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+          body: |
+            Check the changelog: https://github.com/kovurumanasa/manasa-package/blob/main/CHANGELOG.md
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - run: npm ci
-      - run: npm version prerelease --preid=ci-$GITHUB_RUN_ID --no-git-tag-version
+      # - run: npm run lint
+      # - run: npm run build
       - run: npm pack
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
             name: package
             path: "manasa-package/*.tgz"
+      - run: echo "tag=${GITHUB_REF##*/v}" >> $GITHUB_ENV
+      - name: Upload package to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: 'manasa-package/kovurumanasa-manasa-package-${{ env.tag }}.tgz'
+          asset_name: 'kovurumanasa-manasa-package-${{ env.tag }}.tgz'
+          asset_content_type: application/zip
 
-  publish:
-    name: "Publish to GitHub Packages"
-    needs: [package]
+      - run: echo ${{ steps.create_release.outputs.id }} >> release.txt
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+            name: release_id
+            path: manasa-package/release.txt
+
+  release:
+    needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: release
     steps:
-    - name: Upload
-      uses: actions/download-artifact@v2
-      with:
+      - name: Download package
+        uses: actions/download-artifact@v2
+        with:
+            name: release_id
+      - run: echo "release_id=$(cat release.txt)" >> $GITHUB_ENV
+      - name: Publish release
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: process.env.release_id,
+              draft: false
+            })
+  publish-npm:
+    needs: release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: manasa-package
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download package
+        uses: actions/download-artifact@v2
+        with:
+            name: package
+      - run: npm ci
+      # - run: npm run build
+      - run: npm publish --access public $(ls *.tgz)
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+  publish-gpr:
+    needs: release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: manasa-package
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download package
+        uses: actions/download-artifact@v2
+        with:
           name: package
-    - uses: actions/setup-node@v2
-      with:
-        node-version: 12.x
-        registry-url: https://npm.pkg.github.com/
-        # scope: "@aaronpowell"
-    # - run: echo "registry=https://npm.pkg.github.com" >> .npmrc
-    - run: npm publish $(ls *.tgz)
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - run: npm ci
+      - run: echo "registry=https://npm.pkg.github.com/@kovurumanasa" >> .npmrc
+      # - run: npm run build
+      - run: npm publish --access public $(ls *.tgz)
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
