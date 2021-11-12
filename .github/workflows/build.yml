@@ -1,27 +1,3 @@
-# name: Publish NPM Package
-# on:
-#   release:
-#     types: [created]
-#   push:
-#     branches: '*'
-#   pull_request:
-#     branches: '*'
-
-# jobs:
-#   publish:
-#     runs-on: ubuntu-latest
-#     steps: 
-#     - uses: actions/checkout@v2
-#     - uses: actions/setup-node@v2
-#       with:
-#         node-version: '12.x'
-#     - run: npm ci
-#     - name: Release
-#       env:
-#         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#       run: npx -p node@lts -c "npx semantic-release"
-
 name: Node.js CI
 
 on:
@@ -31,7 +7,28 @@ on:
     branches: [ master ]
 
 jobs:
+  build:
+    defaults:
+      run:
+        working-directory: manasa-package
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v2
+      with:
+        node-version: 12.x
+    - run: npm ci
+    # - run: npm run lint
+    # - run: npm run build
+    # TODO - tests
+    # - run: npm test
+
   package:
+    defaults:
+      run:
+        working-directory: manasa-package
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -58,12 +55,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
           name: package
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v1
       with:
         node-version: 12.x
         registry-url: https://npm.pkg.github.com/
         # scope: "@aaronpowell"
-    # - run: echo "registry=https://npm.pkg.github.com" >> .npmrc
     - run: npm publish $(ls *.tgz)
       env:
         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
