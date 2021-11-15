@@ -18,14 +18,6 @@ on:
         - patch
         - minor
         - major
-      # releasetype:
-      #   description: 'Release Type'
-      #   required: true
-      #   type: choice
-      #   options: 
-      #   - alpha
-      #   - beta
-        
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -49,6 +41,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: '16'
+        cache: 'npm'
 
     - name: Install npm packages
       run: npm ci
@@ -58,32 +51,8 @@ jobs:
         git config user.name 'kovurumanasa'
         git config user.email 'kmkovurumanasa@gmail.com'
 
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: bump version
       run: npm version ${{ github.event.inputs.version }}
 
-    - name: Create tag
-      uses: actions/github-script@v3
-      with:
-        github-token: ${{ github.token }}
-        script: |
-          github.git.createRef({
-            ${{ github.event.inputs.version }}
-          })
-
     # - name: Push latest version
     #   run: git push origin main --follow-tags
-    
-    # - name: Create Release
-    #   uses: actions/create-release@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-    #   with:
-    #     tag_name: ${{ github.event.inputs.releasetype }}-${{ github.event.inputs.version }}
-    #     release_name: Release `${{ github.event.inputs.releasetype }}-${{ github.event.inputs.version }}`
-        # draft: false
-        # prerelease: ${{ github.event.inputs.prerelease }}
-
-      
