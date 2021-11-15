@@ -53,13 +53,25 @@ jobs:
     - name: Install npm packages
       run: npm ci
 
-    - name: Setup Git
-      run: |
-        git config user.name 'kovurumanasa'
-        git config user.email 'kmkovurumanasa@gmail.com'
+    # - name: Setup Git
+    #   run: |
+    #     git config user.name 'kovurumanasa'
+    #     git config user.email 'kmkovurumanasa@gmail.com'
+
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: bump version
       run: npm version ${{ github.event.inputs.version }}
+
+    - name: Create tag
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              ${{ github.event.inputs.version }}
+            })
 
     # - name: Push latest version
     #   run: git push origin main --follow-tags
