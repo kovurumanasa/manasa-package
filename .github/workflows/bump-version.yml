@@ -18,12 +18,15 @@ on:
         - patch
         - minor
         - major
-      prerelease:
+      releasetype:
         # Friendly description to be shown in the UI instead of 'name'
-        description: 'Pre-release'
+        description: 'Release Type'
         # Input has to be provided for the workflow to run
-        required: false
-        type: check
+        required: true
+        type: choice
+        options: 
+        - alpha
+        - beta
         
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -58,7 +61,7 @@ jobs:
         git config user.email 'kmkovurumanasa@gmail.com'
 
     - name: bump version
-      run: npm version ${{ github.event.inputs.version }}
+      run: npm version `${{ github.event.inputs.releasetype }}-${{ github.event.inputs.version }}`
 
     # - name: Push latest version
     #   run: git push origin main --follow-tags
@@ -68,9 +71,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: ${{ github.event.inputs.prerelease }}
+        tag_name: ${{ github.event.inputs.releasetype }}-${{ github.event.inputs.version }}
+        release_name: Release `${{ github.event.inputs.releasetype }}-${{ github.event.inputs.version }}`
+        # draft: false
+        # prerelease: ${{ github.event.inputs.prerelease }}
 
       
