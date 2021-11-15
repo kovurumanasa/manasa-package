@@ -65,13 +65,13 @@ jobs:
       run: npm version ${{ github.event.inputs.version }}
 
     - name: Create tag
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            github.git.createRef({
-              ${{ github.event.inputs.version }}
-            })
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{ github.token }}
+        script: |
+          github.git.createRef({
+            ${{ github.event.inputs.version }}
+          })
 
     # - name: Push latest version
     #   run: git push origin main --follow-tags
