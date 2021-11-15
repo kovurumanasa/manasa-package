@@ -3,7 +3,7 @@ name: deploy-to-public-npm
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
     tags-ignore:
       - '*'
   release:
