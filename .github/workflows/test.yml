@@ -1,0 +1,108 @@
+name: deploy-to-public-npm
+
+on:
+  push:
+    branches:
+      - 'master'
+    tags-ignore:
+      - '*'
+  release:
+    types: [prereleased, released]
+
+jobs:
+  extract-tag-name:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.parse.outputs.result }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+      - id: parse
+        uses: actions/github-script@v3
+        with:
+          result-encoding: string
+          script: |
+            const date = new Date();
+            const yyyyMmDd = `${date.toISOString().replace(/[^0-9]/g, '')}`
+            console.log(
+              '\nis a tag: ', (/refs\/tags/).test(process.env.GITHUB_REF),
+              '\ntag value: ', process.env.GITHUB_REF.replace(/refs\/tags\//g, ''),
+              '\n0.0.0 version: ', `0.0.0-${yyyyMmDd}-${process.env.GITHUB_SHA.substr(0, 6)}`
+            );
+            return (/refs\/tags/).test(process.env.GITHUB_REF) ?
+              process.env.GITHUB_REF.replace(/refs\/tags\//g, '') : 
+              `0.0.0-${yyyyMmDd}-${process.env.GITHUB_SHA.substr(0, 6)}`;
+  extract-pre-tag:
+    needs: [extract-tag-name]
+    runs-on: ubuntu-latest
+    env:
+      TAG_NAME: ${{ needs.extract-tag-name.outputs.tag }}
+      PRE_RELEASE: ${{ github.event.release.prerelease }}
+      TARGET_ISH: ${{ github.event.release.target_commitish }}
+    outputs:
+      tag: ${{ steps.parse.outputs.result }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+      - id: parse
+        uses: actions/github-script@v3
+        with:
+          result-encoding: string
+          script: |
+            const tag = (
+              (process.env.GITHUB_EVENT_NAME === 'release') &&
+              (!(process.env.PRE_RELEASE) || (process.env.PRE_RELEASE === 'false')) &&
+              (/^([0-9]+)\.([0-9]+)\.([0-9]+)$/).test(process.env.TAG_NAME) &&
+              'latest'
+            ) || (
+              (/^0\.0\.0.*/).test(process.env.TAG_NAME) &&
+              'dev'
+            ) || 'next';
+            console.log(
+              '\nis release event: ', (process.env.GITHUB_EVENT_NAME === 'release'),
+              '\nis not a pre-release: ', (!process.env.PRE_RELEASE || (process.env.PRE_RELEASE === 'false')),
+              '\nversion tag has no suffix: ', (/^([0-9]+)\.([0-9]+)\.([0-9]+)$/).test(process.env.TAG_NAME),
+              '\nversion is 0.0.0: ', (/^0\.0\.0.*/).test(process.env.TAG_NAME),
+              '\nGITHUB_EVENT_NAME: ', process.env.GITHUB_EVENT_NAME,
+              '\nPRE_RELEASE: ', process.env.PRE_RELEASE,
+              '\nTAG_NAME: ', process.env.TAG_NAME,
+              '\nTAG: ', tag
+            );
+            return tag;
+  publish-to-public-npm:
+    needs: [extract-tag-name, extract-pre-tag]
+    runs-on: ubuntu-latest
+    env:
+      TAG_NAME: ${{ needs.extract-tag-name.outputs.tag }}
+      PRE_TAG: ${{ needs.extract-pre-tag.outputs.tag }}
+      
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+          registry-url: https://registry.npmjs.org
+          scope: '@rss-eng'
+          always-auth: true
+        env:
+          TAG_NAME: ${{ needs.extract-tag-name.outputs.tag }}
+          PRE_TAG: ${{ needs.extract-pre-tag.outputs.tag }}
+          
+      - id: install-and-build
+        run: "npm ci"
+      - id: version-bump
+        run: "npm version --no-git-tag-version --no-commit-hooks --new-version $TAG_NAME"
+        env:
+          TAG_NAME: ${{ needs.extract-tag-name.outputs.tag }}
+          PRE_TAG: ${{ needs.extract-pre-tag.outputs.tag }}
+          
+      # - id: publish-to-registry
+      #   run: "npm ci && npm publish --access public --tag $PRE_TAG"
+      #   env:
+      #     TAG_NAME: ${{ needs.extract-tag-name.outputs.tag }}
+      #     PRE_TAG: ${{ needs.extract-pre-tag.outputs.tag }}
+          
