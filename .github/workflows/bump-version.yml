@@ -60,7 +60,8 @@ jobs:
         registry-url: 'https://npm.pkg.github.com'
         # Defaults to the user or organization that owns the workflow file
         # scope: 'RSS-Engineering'
-      run: npm install
-      run: npm publish
+      run: npm ci
+      run: echo "registry=https://npm.pkg.github.com/kovurumanasa" >> .npmrc
+      run: npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
