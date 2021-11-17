@@ -8,6 +8,9 @@ on:
 
 jobs:
   package:
+    defaults:
+      run:
+        working-directory: manasa-package
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -38,7 +41,8 @@ jobs:
       with:
         node-version: 14.x
         registry-url: https://npm.pkg.github.com/
+    - run: npm ci
     - run: echo "registry=https://npm.pkg.github.com/kovurumanasa" >> .npmrc
-    - run: npm publish $(ls *.tgz)
+    - run: npm publish --access public $(ls *.tgz)
       env:
         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
