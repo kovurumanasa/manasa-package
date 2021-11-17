@@ -42,7 +42,7 @@ jobs:
         node-version: 14.x
         registry-url: https://npm.pkg.github.com/
     - run: npm ci
-    - run: echo "registry=https://npm.pkg.github.com/kovurumanasa" >> .npmrc
+    # - run: echo "registry=https://npm.pkg.github.com/manasakovuru" >> .npmrc
     - run: npm publish --access public $(ls *.tgz)
       env:
         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
