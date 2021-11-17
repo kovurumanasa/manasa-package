@@ -7,9 +7,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kovurumanasa/manasa-package.git"
+    "url": "git+https://github.com/kovurumanasa/manasa-package.git"
   },
   "publishConfig": {
     "kmkovurumanasa:registry": "https://npm.pkg.github.com"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/kovurumanasa/manasa-package/issues"
+  },
+  "homepage": "https://github.com/kovurumanasa/manasa-package#readme",
+  "dependencies": {
+    "commitizen": "^4.2.4"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
