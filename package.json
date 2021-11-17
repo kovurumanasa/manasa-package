@@ -8,5 +8,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/kovurumanasa/manasa-package.git"
+  },
+  "publishConfig": {
+    "kmkovurumanasa:registry": "https://npm.pkg.github.com"
   }
 }
