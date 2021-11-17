@@ -9,8 +9,6 @@ on:
 jobs:
   package:
     defaults:
-      run:
-        working-directory: manasa-package
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
