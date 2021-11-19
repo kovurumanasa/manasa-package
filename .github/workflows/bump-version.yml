@@ -52,12 +52,18 @@ jobs:
     #     git config user.email 'kmkovurumanasa@gmail.com'
 
     - name: bump version
+      uses: anothrNick/github-tag-action@1.36.0
       env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      run: npm version ${{ github.event.inputs.version }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+        DEFAULT_BUMP: ${{ github.event.inputs.version }}
 
-    - name: Push latest version
-      run: git push origin ${{ github.ref }} --follow-tags
+    #   env:
+    #       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    #   run: npm version ${{ github.event.inputs.version }}
+
+    # - name: Push latest version
+    #   run: git push origin ${{ github.ref }} --follow-tags
 
  
         
