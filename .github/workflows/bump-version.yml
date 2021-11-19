@@ -64,24 +64,41 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  publish-gpr:
-    needs: build
+  # publish-gpr:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     packages: write
+  #     contents: read
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: 12
+  #         registry-url: https://npm.pkg.github.com/
+  #     - run: npm ci
+  #     - run: npm publish --access public
+  #     - run: |
+  #         npm run deploy
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+  create-github-release:
+    name: Create GitHub Release
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
+    needs: publish
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create Release Notes
+        uses: actions/github-script@v4.0.2
         with:
-          node-version: 12
-          registry-url: https://npm.pkg.github.com/
-      - run: npm ci
-      - run: npm publish --access public
-      - run: |
-          npm run deploy
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            await github.request(`POST /repos/${{ github.repository }}/releases`, {
+              tag_name: "${{ github.ref }}",
+              generate_release_notes: true
+            });
         
 
 
