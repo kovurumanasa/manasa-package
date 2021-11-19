@@ -54,6 +54,9 @@ jobs:
     - name: bump version
       run: npm version ${{ github.event.inputs.version }}
 
+    - name: Push latest version
+      run: git push origin ${{ github.ref }} --follow-tags
+
   # build:
   #   runs-on: ubuntu-latest
   #   steps:
