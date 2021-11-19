@@ -52,8 +52,6 @@ jobs:
     #     git config user.email 'kmkovurumanasa@gmail.com'
 
     - name: bump version
-      with:
-        ssh-key: ${{ secrets.DEPLOY_KEY }}
       env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       run: npm version ${{ github.event.inputs.version }}
