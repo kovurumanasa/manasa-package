@@ -78,10 +78,11 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: npm ci
       - run: npm publish --access public
+      - run: |
+          npm run deploy
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        run: |
-          npm run deploy
+        
 
 
           
