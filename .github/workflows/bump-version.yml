@@ -52,6 +52,8 @@ jobs:
     #     git config user.email 'kmkovurumanasa@gmail.com'
 
     - name: bump version
+      env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       run: npm version ${{ github.event.inputs.version }}
 
     - name: Push latest version
