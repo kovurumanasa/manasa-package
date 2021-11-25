@@ -34,12 +34,9 @@ jobs:
     # not run the workflow to prevent infinite recursion.)
     - name: Check out source
       uses: actions/checkout@v2
-      with:
-        ssh-key: ${{ secrets.DEPLOY_KEY }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v2
-      uses: fregante/setup-git-user@v1
       with:
         node-version: '16'
         cache: 'npm'
@@ -47,10 +44,10 @@ jobs:
     - name: Install npm packages
       run: npm ci
 
-    # - name: Setup Git
-    #   run: |
-    #     git config user.name 'kovurumanasa'
-    #     git config user.email 'kmkovurumanasa@gmail.com'
+    - name: Setup Git
+      run: |
+        git config user.name "$(git log --format='%an' HEAD^!)"
+        git config user.email "$(git log --format='%ae' HEAD^!)"
 
     # - name: bump version
     #   uses: anothrNick/github-tag-action@1.36.0
@@ -72,13 +69,9 @@ jobs:
 
     - name: bump version
       run: npm version ${{ github.event.inputs.version }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push latest version
       run: git push origin ${{ github.ref }} --follow-tags
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
  
         
