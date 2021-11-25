@@ -49,24 +49,6 @@ jobs:
         git config user.name "$(git log --format='%an' HEAD^!)"
         git config user.email "$(git log --format='%ae' HEAD^!)"
 
-    # - name: bump version
-    #   uses: anothrNick/github-tag-action@1.36.0
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #     WITH_V: true
-    #     DEFAULT_BUMP: ${{ github.event.inputs.version }}
-
-    # - name: Bump version and push tag
-    #   uses: Instrument/github-tag-action@v1.0
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #     BRANCH: ${{ secrets.GITHUB_REF }}
-    #     BUMP: ${{ github.event.inputs.version }}
-
-    #   env:
-    #       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-    #   run: npm version ${{ github.event.inputs.version }}
-
     - name: bump version
       run: npm version ${{ github.event.inputs.version }}
 
