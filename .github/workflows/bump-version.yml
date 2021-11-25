@@ -71,8 +71,8 @@ jobs:
 
     - name: bump version
       run: npm version ${{ github.event.inputs.version }}
-      with:
-      ssh-key: ${{ secrets.DEPLOY_KEY }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push latest version
       run: git push origin ${{ github.ref }} --follow-tags
