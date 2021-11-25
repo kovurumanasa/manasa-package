@@ -46,10 +46,10 @@ jobs:
     - name: Install npm packages
       run: npm ci
 
-    # - name: Setup Git
-    #   run: |
-    #     git config user.name 'kovurumanasa'
-    #     git config user.email 'kmkovurumanasa@gmail.com'
+    - name: Setup Git
+      run: |
+        git config user.name 'kovurumanasa'
+        git config user.email 'kmkovurumanasa@gmail.com'
 
     # - name: bump version
     #   uses: anothrNick/github-tag-action@1.36.0
@@ -68,6 +68,9 @@ jobs:
     #   env:
     #       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     #   run: npm version ${{ github.event.inputs.version }}
+
+    - name: bump version
+      run: npm version ${{ github.event.inputs.version }}
 
     - name: Push latest version
       run: git push origin ${{ github.ref }} --follow-tags
