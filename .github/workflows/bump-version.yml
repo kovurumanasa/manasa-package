@@ -70,8 +70,9 @@ jobs:
     #   run: npm version ${{ github.event.inputs.version }}
 
     - name: bump version
-    - uses: fregante/setup-git-user@v1
       run: npm version ${{ github.event.inputs.version }}
+      with:
+      ssh-key: ${{ secrets.DEPLOY_KEY }}
 
     - name: Push latest version
       run: git push origin ${{ github.ref }} --follow-tags
