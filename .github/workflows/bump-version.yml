@@ -46,8 +46,10 @@ jobs:
 
     - name: Setup Git
       run: |
-        git config user.name "$(git log --format='%an' HEAD^!)"
-        git config user.email "$(git log --format='%ae' HEAD^!)"
+        git config --global user.email "${GH_USERNAME}@users.noreply.github.com"
+        git config --global user.name "${GH_USERNAME}"
+      env:
+        GH_USERNAME: ${{ github.event.schedule.user.login }}
 
     - name: bump version
       run: npm version ${{ github.event.inputs.version }}
