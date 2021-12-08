@@ -49,7 +49,7 @@ jobs:
         git config --global user.email "${GH_USERNAME}@users.noreply.github.com"
         git config --global user.name "${GH_USERNAME}"
       env:
-        GH_USERNAME: ${{ github.event.schedule.user.login }}
+        GH_USERNAME: ${{ github.actor }}
 
     - name: bump version
       run: npm version ${{ github.event.inputs.version }}
